@@ -16,18 +16,18 @@ public:
 
 	bool TryToPutStone(const Stone &stone, const Position &position);
 
-	GameStatus GetGameStatus();
+	GameStatus GetGameStatus() const;
 
-	Board GetBoard();
+	Board GetBoard() const;
 
-	std::list<Stone> GetRemainingStones();
+	std::list<Stone> GetRemainingStones() const;
 
 private:
-	bool _PositionIsFree(const Position &position);
+	bool _PositionIsFree(const Position &position) const;
 
-	std::list<Stone>::const_iterator _FindStoneAmongRemainingStones(const Stone &stone);
+	std::list<Stone>::const_iterator _FindStoneAmongRemainingStones(const Stone &stone) const;
 
-	std::list<Stone> _GetAllStoneCombinations();
+	std::list<Stone> _GetAllStoneCombinations() const;
 
 	void _UpdateGameStatus();
 

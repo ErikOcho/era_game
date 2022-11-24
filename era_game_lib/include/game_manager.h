@@ -6,19 +6,21 @@
 #include "game_board.h"
 #include "terminal_player.h"
 
+#include <memory> // std::unique_ptr, ...
 
 class GameManager
 {
 public:
-	GameManager();
+	GameManager(std::unique_ptr<GameBoard> upGameBoard);
 
 	void RunGame(bool computerBegins = true);
 
 private:
 	void _PrintJsonMessageToConsole(const std::string& message);
 
-	std::unique_ptr<IPlayer> _spFirstPlayer;
-	std::unique_ptr<IPlayer> _spSecondPlayer;
-	std::shared_ptr<GameBoard> _spGameBoard;
+	bool _StoneIsAmongFreeStones(const Stone& stone);
 
+	std::unique_ptr<IPlayer> _upFirstPlayer;
+	std::unique_ptr<IPlayer> _upSecondPlayer;
+	std::shared_ptr<GameBoard> _spGameBoard;
 };

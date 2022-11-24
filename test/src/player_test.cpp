@@ -17,7 +17,7 @@ using namespace testing;
 TEST(A, B) 
 {
 	std::shared_ptr<GameBoard> spBoard = std::make_shared<GameBoard>();
-	TerminalPlayer player1 {"jozef:", spBoard};
+	TerminalPlayer player1 {"jozef:", std::make_shared<GameBoardView>(spBoard)};
 
 	// auto position = player1.PlaceStone(Stone{"0001"});
 	// auto chosenStone {player1.ChooseStoneForOpponent()};
@@ -25,8 +25,10 @@ TEST(A, B)
 
 #include "game_manager.h"
 
-TEST(EraGame, Run)
+TEST(EraGame, DISABLED_Run)
 {
-	GameManager gm {};
+	std::unique_ptr<GameBoard> spBoard = std::make_unique<GameBoard>();
+
+	GameManager gm {std::move(spBoard)};
 	gm.RunGame();
 }

@@ -9,9 +9,9 @@
 #include <cassert>
 
 
-TerminalPlayer::TerminalPlayer(const std::string& name, std::shared_ptr<GameBoard> spGameBoard) : _name {name}, _spGameBoard{spGameBoard}
+TerminalPlayer::TerminalPlayer(const std::string& name, std::shared_ptr<GameBoardView> spGameBoardView) : _name {name}, _spGameBoardView{spGameBoardView}
 {
-	assert(_spGameBoard);
+	assert(_spGameBoardView);
 }
 
 
@@ -22,7 +22,7 @@ std::string TerminalPlayer::GetName()
 
 Position TerminalPlayer::PlaceStone(const Stone& chosenStone)
 {
-	auto board {_spGameBoard->GetBoard()};
+	auto board {_spGameBoardView->GetBoard()};
 	// Make decision.
 	std::string jsonMessage {};
 
@@ -55,7 +55,7 @@ Position TerminalPlayer::PlaceStone(const Stone& chosenStone)
 // Player chooses stone for opponent.
 Stone TerminalPlayer::ChooseStoneForOpponent()
 {
-	auto remainingStones = _spGameBoard->GetRemainingStones();
+	auto remainingStones = _spGameBoardView->GetRemainingStones();
 	std::string jsonMessage {};
 
 	while (true)

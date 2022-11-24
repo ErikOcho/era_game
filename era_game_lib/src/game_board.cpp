@@ -65,32 +65,32 @@ bool GameBoard::TryToPutStone(const Stone &stone, const Position &position)
 	return stoneWasPlaced;
 }
 
-GameStatus GameBoard::GetGameStatus()
+GameStatus GameBoard::GetGameStatus() const
 {
 	return _gameStatus;
 }
 
-Board GameBoard::GetBoard()
+Board GameBoard::GetBoard() const
 {
 	return _board;
 }
 
-std::list<Stone> GameBoard::GetRemainingStones()
+std::list<Stone> GameBoard::GetRemainingStones() const
 {
-return _remaingStones;
+	return _remaingStones;
 }
 
-bool GameBoard::_PositionIsFree(const Position &position)
+bool GameBoard::_PositionIsFree(const Position &position) const
 {
 	return !_board[position.x][position.y].has_value();
 }
 
-std::list<Stone>::const_iterator GameBoard::_FindStoneAmongRemainingStones(const Stone& stone)
+std::list<Stone>::const_iterator GameBoard::_FindStoneAmongRemainingStones(const Stone& stone) const
 {
 	return std::find(_remaingStones.cbegin(), _remaingStones.cend(), stone);
 }
 
-std::list<Stone> GameBoard::_GetAllStoneCombinations()
+std::list<Stone> GameBoard::_GetAllStoneCombinations() const
 {
 	std::list<Stone> allStones{};
 	constexpr std::size_t numberOfStones{dimension * dimension};

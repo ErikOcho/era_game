@@ -5,6 +5,7 @@
 
 #include "game_board.h" // TODO interface
 #include "player_intf.h"
+#include "game_board_view.h"
 
 // STL:
 #include <string>
@@ -15,7 +16,7 @@
 class TerminalPlayer : public IPlayer
 {
 public:
-	TerminalPlayer(const std::string& name, std::shared_ptr<GameBoard> _spGameBoard);
+	TerminalPlayer(const std::string& name, std::shared_ptr<GameBoardView> _spGameBoardView);
 
 public:
 	virtual Position PlaceStone(const Stone& stone) override;
@@ -26,6 +27,6 @@ public:
 	virtual std::string GetName() override;
 
 private:
-	std::shared_ptr<GameBoard> _spGameBoard;
+	std::shared_ptr<GameBoardView> _spGameBoardView;
 	std::string _name;
 };

@@ -13,15 +13,15 @@
 class DumbPlayer : public IPlayer
 {
 public:
-	DumbPlayer(const std::string& name, std::shared_ptr<GameBoard> spGameBoard) : _name {name}, _spGameBoard{spGameBoard}
+	DumbPlayer(const std::string& name, std::shared_ptr<GameBoardView> spGameBoard) : _name {name}, _spGameBoardView{spGameBoard}
 	{
-		assert(_spGameBoard);
+		assert(_spGameBoardView);
 	}
 
 public:
 	virtual Position PlaceStone(const Stone& stone) override
 	{
-		auto board {_spGameBoard->GetBoard()};
+		auto board {_spGameBoardView->GetBoard()};
 		for (std::size_t i {}; i < board.size(); ++i){
 			for (std::size_t j {}; j < board.size(); ++j) {
 				if (!board[i][j].has_value()) {
@@ -35,7 +35,7 @@ public:
 	// Player chooses stone for opponent.
 	virtual Stone ChooseStoneForOpponent() override
 	{
-		return _spGameBoard->GetRemainingStones().front();
+		return _spGameBoardView->GetRemainingStones().front();
 	}
 
 	virtual std::string GetName() override
@@ -44,62 +44,72 @@ public:
 	}
 
 private:
-	std::shared_ptr<GameBoard> _spGameBoard;
+	std::shared_ptr<GameBoardView> _spGameBoardView;
 	std::string _name;
 };
 
 
-GameManager::GameManager()
+GameManager::GameManager(std::unique_ptr<GameBoard> upGameBoard) : _spGameBoard {std::move(upGameBoard)}
 {}
+
 
 void GameManager::RunGame(bool computerBegins)
 {
-	// Make game board.
-	auto spGameBoard = std::make_shared<GameBoard>();
+	// Making shared_ptr from unique.
+	auto spGameBoardView = std::make_shared<GameBoardView>(_spGameBoard);
 
 	// Create players.
 	if (computerBegins) {
-		_spFirstPlayer = std::make_unique<DumbPlayer>("Computer", spGameBoard);
-		_spSecondPlayer = std::make_unique<TerminalPlayer>("Player", spGameBoard);
+		_upFirstPlayer = std::make_unique<DumbPlayer>("Computer", spGameBoardView);
+		_upSecondPlayer = std::make_unique<TerminalPlayer>("Player", spGameBoardView);
 	}
 	else {
-		_spSecondPlayer = std::make_unique<DumbPlayer>("Computer", spGameBoard);
-		_spFirstPlayer = std::make_unique<TerminalPlayer>("Player", spGameBoard);
+		_upSecondPlayer = std::make_unique<DumbPlayer>("Computer", spGameBoardView);
+		_upFirstPlayer = std::make_unique<TerminalPlayer>("Player", spGameBoardView);
 	}
-
-
 
 	Stone stoneForOpponent {};
 	Position position {};
-	// {"stone": "0000", "field": 21}
-	// {"stone": "0110", "field": 22}
-	// {"chosen_stone":"0011"}
-	// {"chosen_stone":"0011"}
-	while (spGameBoard->GetGameStatus() == GameStatus::Playing)
+	
+	while (_spGameBoard->GetGameStatus() == GameStatus::Playing)
 	{
 		while (true) {
-			stoneForOpponent = _spFirstPlayer->ChooseStoneForOpponent();
-			auto remainingStones = spGameBoard->GetRemainingStones();
-			if (std::find(remainingStones.cbegin(), remainingStones.cend(), stoneForOpponent) != remainingStones.cend()){
+			stoneForOpponent = _upFirstPlayer->ChooseStoneForOpponent();
+			if (_StoneIsAmongFreeStones(stoneForOpponent)){
 				break;
 			}
 		}
-		_PrintJsonMessageToConsole(JsonDecoder::ConvertChooseStoneCommand(stoneForOpponent));
+		if (_upFirstPlayer->GetName() == "Computer") {
+			_PrintJsonMessageToConsole(JsonDecoder::ConvertChooseStoneCommand(stoneForOpponent));
+		}
 
 		while (true) {
-			position = _spSecondPlayer->PlaceStone(stoneForOpponent);
-			if (spGameBoard->TryToPutStone(stoneForOpponent, {position.x - 1, position.y - 1})) {
+			position = _upSecondPlayer->PlaceStone(stoneForOpponent);
+			if (_spGameBoard->TryToPutStone(stoneForOpponent, {position.x - 1, position.y - 1})) {
 				break;
 			}
 		}
-		_PrintJsonMessageToConsole(JsonDecoder::ConvertPlaceStoneCommand(stoneForOpponent, position));
-		_PrintJsonMessageToConsole(JsonDecoder::ConvertGameStatus(spGameBoard->GetGameStatus(), _spSecondPlayer->GetName() == "Computer"));
+		if (_upFirstPlayer->GetName() == "Computer") {
+			_PrintJsonMessageToConsole(JsonDecoder::ConvertPlaceStoneCommand(stoneForOpponent, position));
+		}
+		_PrintJsonMessageToConsole(JsonDecoder::ConvertGameStatus(_spGameBoard->GetGameStatus(), _upSecondPlayer->GetName() == "Computer"));
 
-		std::swap(_spFirstPlayer, _spSecondPlayer);
+		std::swap(_upFirstPlayer, _upSecondPlayer);
 	}
+
 }
 
 void GameManager::_PrintJsonMessageToConsole(const std::string & message)
 {
 	std::cout << message << std::endl;
+}
+
+bool GameManager::_StoneIsAmongFreeStones(const Stone & stone)
+{
+	auto remainingStones = _spGameBoard->GetRemainingStones();
+	if (std::find(remainingStones.cbegin(), remainingStones.cend(), stone) != remainingStones.cend())
+	{
+		return false;
+	}
+	return true;
 }
