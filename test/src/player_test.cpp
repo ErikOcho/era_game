@@ -25,7 +25,7 @@ TEST(A, B)
 
 #include "game_manager.h"
 
-TEST(EraGame, DISABLED_Run)
+TEST(EraGame, Run)
 {
 	std::unique_ptr<GameBoard> spBoard = std::make_unique<GameBoard>();
 

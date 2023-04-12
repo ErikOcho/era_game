@@ -55,7 +55,6 @@ GameManager::GameManager(std::unique_ptr<GameBoard> upGameBoard) : _spGameBoard 
 
 void GameManager::RunGame(bool computerBegins)
 {
-	// Making shared_ptr from unique.
 	auto spGameBoardView = std::make_shared<GameBoardView>(_spGameBoard);
 
 	// Create players.
@@ -109,7 +108,7 @@ bool GameManager::_StoneIsAmongFreeStones(const Stone & stone)
 	auto remainingStones = _spGameBoard->GetRemainingStones();
 	if (std::find(remainingStones.cbegin(), remainingStones.cend(), stone) != remainingStones.cend())
 	{
-		return false;
+		return true;
 	}
-	return true;
+	return false;
 }

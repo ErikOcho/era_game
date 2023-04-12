@@ -109,12 +109,15 @@ void GameBoard::_UpdateGameStatus()
 		}
 		// Check for win in row.
 		auto &rowValues {_board[_lastStonePosition.x]};
-		auto sameBitsRow {std::accumulate(rowValues.cbegin(), rowValues.cend(), Stone{"1111"}, [](const Stone &value, const std::optional<Stone> &stone)
-						{ return stone.has_value() ? value & stone.value() : Stone {"0000"}; })};
+		auto sameBitsRow {
+			std::accumulate(rowValues.cbegin(), rowValues.cend(), Stone{"1111"},
+			[](const Stone &value, const std::optional<Stone> &stone)
+			{ return stone.has_value() ? value & stone.value() : Stone {"0000"}; })
+		};
 
 		// Check for win in collumn.
-		Stone sameBitsCollumn{"1111"};
-		for (std::size_t i{}; i < dimension; ++i)
+		Stone sameBitsCollumn {"1111"};
+		for (std::size_t i {}; i < dimension; ++i)
 		{
 			sameBitsCollumn = _board[i][_lastStonePosition.y].has_value() ? _board[i][_lastStonePosition.y].value() & sameBitsCollumn : Stone{"0000"};
 		}

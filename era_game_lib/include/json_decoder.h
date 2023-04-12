@@ -7,8 +7,6 @@
 #include <tuple>
 #include <string>
 
-
-
 namespace JsonDecoder
 {
 	using JsonType = std::string;
